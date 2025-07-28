@@ -1,3 +1,7 @@
+<?php
+
+?>
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -9,10 +13,10 @@
 <body>
     <h1>Bienvenue</h1>
     <h2>LOG IN</h2>
-    <form action="" method="post">
-
-        <label for="utilisateur">Nom d'utilisateur</label><br>
-        <input type="text" name="utilisatuer" id="utilisateur" required><br>
+    <form action="proces.php" method="post">
+        <input type="hidden" name="logIn" value="logIn">
+        <label for="username">Nom d'utilisateur</label><br>
+        <input type="text" name="username" id="username" required><br>
         <label for="mot de passe">Mot de passe</label><br>
         <input type="password" name="password" id="password" required><br>
         <input type="submit" value="LOG IN">
