@@ -1,4 +1,26 @@
-<?php 
+<?php
+session_start();
+require_once 'proces.php';
+if (isconnected()) {
+    header("Location: dashboard.php");
+    exit();
+}
+
+if (isset($_POST['username']) && $_POST['password'] && isset($_POST['email'])) {
+  
+    $username = htmlspecialchars($_POST['username']);
+    $password = htmlspecialchars($_POST['password']);
+    $email = htmlspecialchars($_POST['email']);
+
+    if (userExists($username)) {
+        $noacces="username existe déjà.";
+    } else {
+        newRegistre($username, $password, $email);
+        header("Location: index.php");
+        exit();
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -12,8 +34,7 @@
 <body>
     <h1>Bienvenue</h1>
     <h2>Se registrer</h2>
-    <form action="proces.php" method="post">
-        <input type="hidden" name="registre" value="registre">
+    <form action="" method="post">
         
         <label for="username">Username</label><br>
         <input type="text" name="username" id="username"required><br>
@@ -26,6 +47,10 @@
         
         <input type="submit" value="Se registrer">
     </form>
+
+    <?php if (isset($noacces)) : ?>
+        <p class="error"><?= $noacces ?></p>
+    <?php endif; ?>
 <a href="index.php"><p>Déjà inscrit ? Connectez-vous</p></a>
 </body>
 </html>

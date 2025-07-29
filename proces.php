@@ -9,6 +9,10 @@ function connect() {
     return $bdd;
 }
 
+function isconnected() {
+    return isset($_SESSION['id']);
+}   
+
 function newRegistre($username, $password, $email) {
     $bdd = connect();
     $option=["cost"=>12];
@@ -28,10 +32,12 @@ function userExists($username) {
 }
 
 function createtache($title, $description, $user_id) {
+    $date = date('Y-m-d H:i:s');
+    $status = 0; 
     $bdd = connect();
-    $sql = "INSERT INTO tasks(title, description, user_id) VALUES (?, ?, ?)";
+    $sql = "INSERT INTO tasks(title, description, user_id, create_at, status) VALUES (?, ?, ?, ?, ?)";
     $stmt = $bdd->prepare($sql);
-    $stmt->execute([$title, $description, $user_id]);
+    $stmt->execute([$title, $description, $user_id, $date, $status]);
     
 }
 
@@ -42,46 +48,50 @@ function getTasksByUserId($user_id) {
     $stmt->execute([$user_id]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
+function deleteTask($task_id) {
+    $bdd = connect();
+    $sql = "DELETE FROM tasks WHERE id = ?";
+    $stmt = $bdd->prepare($sql);
+    $stmt->execute([$task_id]);
+}
 
+function updateTaskStatus($task_id, $status) {
+    $date = date('Y-m-d H:i:s');
+    $bdd = connect();
+    $sql = "UPDATE tasks SET status = ?, termine_at = ? WHERE id = ?";
+    $stmt = $bdd->prepare($sql);
+    $stmt->execute([$status, $date, $task_id]);
+}
+function verifystatus($task_id) {
+    $bdd = connect();
+    $sql = "SELECT status FROM tasks WHERE id = ?";
+    $stmt = $bdd->prepare($sql);
+    $stmt->execute([$task_id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
 
-
-
-$registre = "registre";
-$logIn = "logIn";
-
-
-if (isset($_POST['registre']) && $_POST['registre'] === $registre) {
-        echo "ahora si entro";
-    echo " \n";
-     echo " \n";    
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-    $email = $_POST['email'];
-
-    if (userExists($username)) {
-        echo "username existe déjà.";
-    } else {
-        newRegistre($username, $password, $email);
-        header("Location: index.php");
-        exit();
-    }
-} elseif (isset($_POST['logIn']) && $_POST['logIn'] === 'logIn') {
-
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-
-    $user=userExists($username);
-
-    var_dump($user);
+if(isset($_GET['id'])&& isset($_GET['borrar'])) {
+    $task_id = $_GET['id'];
+    deleteTask($task_id);
+    header("Location: dashboard.php");
+    exit();
+}else if((isset($_GET['id']) && isset($_GET['status']))) {
+    $task_id = $_GET['id'];
+    $status = $_GET['status'];
     
-    if ($user['username']===$username && password_verify($password, $user['password'])) {
-        $_SESSION = $user;
+    if (verifystatus($task_id) == 1) {
+    
         header("Location: dashboard.php");
         exit();
+    
     } else {
-        echo "Identifiants incorrects.";
-    }
+        
+    updateTaskStatus($task_id, $status);
+    header("Location: dashboard.php");
+    exit();
 }
+}
+
 
 
 
