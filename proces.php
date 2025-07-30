@@ -78,8 +78,8 @@ if(isset($_GET['id'])&& isset($_GET['borrar'])) {
 }else if((isset($_GET['id']) && isset($_GET['status']))) {
     $task_id = $_GET['id'];
     $status = $_GET['status'];
-    
-    if (verifystatus($task_id) == 1) {
+    $statusactive = verifystatus($task_id);
+    if ($statusactive['status'] == 1) {
     
         header("Location: dashboard.php");
         exit();
